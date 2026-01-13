@@ -112,15 +112,13 @@ def generate_launch_description():
         period=1.0,  # 1 saniye bekle (TF tree hazır olsun)
         actions=[
             Node(
-                package="rplidar_ros2",
-                executable="rplidar_ros2_node",
+                package="rplidar_ros",
+                executable="rplidar_node",
                 name="rplidar_node",
                 parameters=[
                     {"serial_port": lidar_port},
-                    {"serial_baudrate": 115200},
+                    {"serial_baudrate": 256000},  # RPLIDAR A2 için 256000 baudrate
                     {"frame_id": "laser_link"},
-                    {"range_min": 0.15},
-                    {"range_max": 16.0},
                     {"use_sim_time": use_sim_time},
                 ],
                 output="screen",
