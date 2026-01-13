@@ -1,0 +1,229 @@
+<sdf version="1.9">
+  <model name="my_robot">
+    <pose>0 0 0 0 0 0</pose>
+
+    <!-- BASE -->
+    <link name="base_link">
+      <!-- base_link merkezini yerden yukarı al: base_height/2 + wheel_radius = 0.06 + 0.05 = 0.11 -->
+      <pose>0 0 0.11 0 0 0</pose>
+
+      <inertial>
+        <mass>8.0</mass>
+        <inertia>
+          <ixx>0.10</ixx><iyy>0.10</iyy><izz>0.10</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+
+      <!-- Görsel gövde -->
+      <visual name="base_visual">
+        <geometry>
+          <box><size>0.35 0.25 0.12</size></box>
+        </geometry>
+        <material>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.75 0.75 0.75 1</diffuse>
+        </material>
+      </visual>
+
+      <!-- ÇARPIŞMA gövdesini biraz yukarı alıyoruz ki tekerle çakışmasın -->
+      <collision name="base_collision">
+        <pose>0 0 0.05 0 0 0</pose>
+        <geometry>
+          <box><size>0.35 0.25 0.10</size></box>
+        </geometry>
+        <surface>
+          <bounce><restitution_coefficient>0.0</restitution_coefficient></bounce>
+        </surface>
+      </collision>
+    </link>
+
+    <!-- LEFT WHEEL -->
+    <link name="left_wheel_link">
+      <!-- Wheel merkezini base_link'e göre konumlandır: x arkada, y sol, z aşağı -->
+      <pose relative_to="base_link">-0.125 0.15 -0.06 0 0 0</pose>
+
+      <inertial>
+        <mass>1.0</mass>
+        <inertia>
+          <ixx>0.005</ixx><iyy>0.005</iyy><izz>0.005</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+
+      <collision name="left_wheel_collision">
+        <!-- silindiri teker gibi yap: pi/2 roll -->
+        <pose>0 0 0 1.5708 0 0</pose>
+        <geometry><cylinder><radius>0.05</radius><length>0.03</length></cylinder></geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1.2</mu>
+              <mu2>1.2</mu2>
+            </ode>
+          </friction>
+          <bounce><restitution_coefficient>0.0</restitution_coefficient></bounce>
+        </surface>
+      </collision>
+
+      <visual name="left_wheel_visual">
+        <pose>0 0 0 1.5708 0 0</pose>
+        <geometry><cylinder><radius>0.05</radius><length>0.03</length></cylinder></geometry>
+        <material>
+          <ambient>0.02 0.02 0.02 1</ambient>
+          <diffuse>0.05 0.05 0.05 1</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <!-- RIGHT WHEEL -->
+    <link name="right_wheel_link">
+      <pose relative_to="base_link">-0.125 -0.15 -0.06 0 0 0</pose>
+
+      <inertial>
+        <mass>1.0</mass>
+        <inertia>
+          <ixx>0.005</ixx><iyy>0.005</iyy><izz>0.005</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+
+      <collision name="right_wheel_collision">
+        <pose>0 0 0 1.5708 0 0</pose>
+        <geometry><cylinder><radius>0.05</radius><length>0.03</length></cylinder></geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1.2</mu>
+              <mu2>1.2</mu2>
+            </ode>
+          </friction>
+          <bounce><restitution_coefficient>0.0</restitution_coefficient></bounce>
+        </surface>
+      </collision>
+
+      <visual name="right_wheel_visual">
+        <pose>0 0 0 1.5708 0 0</pose>
+        <geometry><cylinder><radius>0.05</radius><length>0.03</length></cylinder></geometry>
+        <material>
+          <ambient>0.02 0.02 0.02 1</ambient>
+          <diffuse>0.05 0.05 0.05 1</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <!-- CASTER (biraz daha geride) -->
+    <link name="caster_link">
+      <!-- önce 0.145'ti; 0.10 yaptım (geriye) -->
+      <pose relative_to="base_link">0.10 0 -0.06 0 0 0</pose>
+
+      <inertial>
+        <mass>0.3</mass>
+        <inertia>
+          <ixx>0.001</ixx><iyy>0.001</iyy><izz>0.001</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+
+      <collision name="caster_collision">
+        <geometry><sphere><radius>0.05</radius></sphere></geometry>
+        <surface>
+          <!-- caster daha kaygan olsun -->
+          <friction>
+            <ode>
+              <mu>0.2</mu>
+              <mu2>0.2</mu2>
+            </ode>
+          </friction>
+          <bounce><restitution_coefficient>0.0</restitution_coefficient></bounce>
+        </surface>
+      </collision>
+
+      <visual name="caster_visual">
+        <geometry><sphere><radius>0.05</radius></sphere></geometry>
+        <material>
+          <ambient>0.02 0.02 0.02 1</ambient>
+          <diffuse>0.05 0.05 0.05 1</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <!-- JOINTS -->
+    <joint name="left_wheel_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>left_wheel_link</child>
+      <axis>
+        <!-- teker mili Y ekseni -->
+        <xyz>0 1 0</xyz>
+        <limit><lower>-1e16</lower><upper>1e16</upper></limit>
+      </axis>
+    </joint>
+
+    <joint name="right_wheel_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>right_wheel_link</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-1e16</lower><upper>1e16</upper></limit>
+      </axis>
+    </joint>
+
+    <joint name="caster_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>caster_link</child>
+    </joint>
+
+    <!-- LIDAR -->
+    <link name="laser_link">
+      <pose relative_to="base_link">0.12 0 0.11 0 0 0</pose>
+      <sensor name="lidar" type="gpu_lidar">
+        <always_on>true</always_on>
+        <update_rate>10</update_rate>
+        <topic>/scan</topic>
+        
+
+        
+        <lidar>
+          <scan>
+            <horizontal>
+              <samples>720</samples>
+              <min_angle>-3.14159</min_angle>
+              <max_angle>3.14159</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.12</min>
+            <max>8.0</max>
+            <resolution>0.01</resolution>
+          </range>
+        </lidar>
+      </sensor>
+    </link>
+
+    <!-- DIFF DRIVE -->
+    <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+
+      <wheel_separation>0.30</wheel_separation>
+      <wheel_radius>0.05</wheel_radius>
+
+      <topic>/cmd_vel</topic>
+      <odom_topic>/odom</odom_topic>
+
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_footprint</child_frame_id>
+
+      <tf_topic>/tf</tf_topic>
+      <odom_publisher_frequency>30</odom_publisher_frequency>
+    </plugin>
+
+    <plugin
+      filename="gz-sim-sensors-system"
+      name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+  
+  
+  </model>
+</sdf>
