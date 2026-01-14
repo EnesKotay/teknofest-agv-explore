@@ -1,6 +1,6 @@
 """
 Gerçek Robot Otonom Keşif Launch Dosyası
-STM32 Nucleo + Micro-ROS + LIDAR
+STM32F4 + Micro-ROS + LIDAR
 
 Bu launch dosyası:
 1. real_robot_bringup.launch.py'yi include eder (Micro-ROS, TF, vb.)

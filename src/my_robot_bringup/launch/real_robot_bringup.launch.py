@@ -1,6 +1,6 @@
 """
 Gerçek Robot Bringup Launch Dosyası
-Micro-ROS kullanarak STM32 Nucleo ile haberleşme
+Micro-ROS kullanarak STM32F4 ile haberleşme
 
 Bu launch dosyası:
 1. micro_ros_agent başlatır (STM32 ile haberleşme için)

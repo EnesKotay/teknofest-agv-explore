@@ -55,10 +55,11 @@ NOT: ros2_control entegrasyonu YOK (Micro-ROS kullanıyoruz)
   </link>
 
   <!-- base_footprint -> base_link joint -->
+  <!-- base_footprint z=0 (yer seviyesi), base_link z=wheel_radius yukarıda -->
   <joint name="base_joint" type="fixed">
     <parent link="base_footprint"/>
     <child link="base_link"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>  
+    <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>  
   </joint>
 
   <!-- LIDAR -->

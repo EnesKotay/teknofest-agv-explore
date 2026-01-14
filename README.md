@@ -8,7 +8,7 @@ ROS2 Jazzy tabanlı otonom keşif sistemi. Frontier-based exploration algoritmas
 - **SLAM:** SLAM Toolbox ile gerçek zamanlı harita oluşturma
 - **Navigasyon:** Nav2 stack ile otonom navigasyon
 - **Return-to-Start:** Keşif tamamlandıktan sonra başlangıç noktasına dönme
-- **Gerçek Robot Desteği:** STM32 Nucleo + Micro-ROS entegrasyonu
+- **Gerçek Robot Desteği:** STM32F4 + Micro-ROS entegrasyonu
 - **LIDAR Desteği:** RPLIDAR A2 entegrasyonu
 
 ## 📋 Gereksinimler
@@ -18,7 +18,7 @@ ROS2 Jazzy tabanlı otonom keşif sistemi. Frontier-based exploration algoritmas
 - **Donanım (Simülasyon):** Gazebo Gz
 - **Donanım (Gerçek Robot):**
   - Raspberry Pi 5 (Ubuntu 24.04 Server)
-  - STM32 Nucleo (F401RE veya F446RE)
+  - STM32F4 (F401 veya F446)
   - RPLIDAR A2
   - Differential drive robot
 

@@ -8,11 +8,11 @@ frontier_explorer:
     robot_frame: base_footprint
     nav_action: navigate_to_pose
     
-    # Hedef seçim parametreleri - DÖNÜŞ SORUNUNU ÖNLEMEK İÇİN OPTİMİZE EDİLDİ
-    min_goal_distance: 1.2          # Artırıldı: daha uzak hedefleri seçer, aynı yerde dönmez (0.5 -> 1.2)
-    goal_cooldown_sec: 1.0          # Artırıldı: daha az sıklıkla goal seçer (0.5 -> 1.0)
-    goal_timeout_sec: 60.0          # Takılma durumunda daha hızlı vazgeç
-    replan_period_sec: 1.5          # Daha sık kontrol
+    # Hedef seçim parametreleri - DAIRE ÇİZMEYİ ÖNLEMEK İÇİN OPTİMİZE EDİLDİ
+    min_goal_distance: 2.5          # Artırıldı: çok yakın goal'ları engelle - daire çizmemesi için (1.5 -> 2.5)
+    goal_cooldown_sec: 2.5          # Artırıldı: goal seçim aralığını uzat - daire çizmemesi için (1.5 -> 2.5)
+    goal_timeout_sec: 45.0          # Optimize: daha hızlı vazgeçme - zaman tasarrufu
+    replan_period_sec: 1.5          # Optimal: sık kontrol
     
     # Harita işleme parametreleri - GÜVENLİK ARTIRILDI
     free_value_max: 10              # 0..10 free kabul et (değişmedi)
@@ -23,19 +23,21 @@ frontier_explorer:
     return_to_start: true            # Haritalama bitince başlangıca dön
     start_position_timeout: 10.0     # Başlangıç pozisyonunu kaydetmek için bekleme süresi (saniye)
     
-    # GELİŞMİŞ ÖZELLİKLER - Teknofest Optimizasyonları
+    # GELİŞMİŞ ÖZELLİKLER - TEKNOFEST OPTİMİZASYONLARI
     # Information Gain (Bilgi Kazancı) - Daha büyük keşfedilmemiş alana yakın frontieri önceliklendir
     use_information_gain: true       # Information gain kullan (true/false)
-    information_gain_weight: 2.0     # Information gain ağırlığı (ne kadar önemli)
+    information_gain_weight: 2.5     # Dengeli: bilgi kazancı önceliklendir ama aşırı agresif olmasın (3.0 -> 2.5)
+    information_gain_min_threshold: 1.0  # Minimum info gain - altındaysa distance-based fallback (guardrail)
+    distance_normalization_max: 20.0     # Max distance for normalization - scoring stabilitesi için
     
     # Frontier Clustering (Frontier Kümeleme) - Yakın frontieri grupla
-    frontier_cluster_distance: 5     # Piksel - kümeleme için maksimum mesafe
-    min_cluster_size: 3              # Minimum hücre sayısı (daha küçük kümeleri yok say)
+    frontier_cluster_distance: 6     # Artırıldı: daha büyük cluster'lar - daha iyi goal seçimi (5 -> 6)
+    min_cluster_size: 2              # Azaltıldı: daha fazla seçenek - verimli keşif (3 -> 2)
     
-    # Stuck Detection (Takılma Algılama)
+    # Stuck Detection (Takılma Algılama) - TEKNOFEST OPTİMİZASYONU
     stuck_detection_enabled: true    # Takılma algılamayı etkinleştir
     stuck_distance_threshold: 0.5    # Metre - takılı sayılması için maksimum hareket mesafesi
-    stuck_time_threshold: 30.0       # Saniye - takılı sayılması için minimum süre
+    stuck_time_threshold: 20.0       # Azaltıldı: daha hızlı tespit - zaman tasarrufu (30.0 -> 20.0)
     
     # Performance Optimization (Performans Optimizasyonu)
     roi_radius: 15.0                 # Metre - Region of Interest yarıçapı (sadece robot çevresini tara)

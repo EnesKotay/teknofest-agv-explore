@@ -26,7 +26,7 @@ slam_toolbox:
     debug_logging: false
     throttle_scans: 1
     transform_publish_period: 0.02 #if 0 never publishes odometry
-    map_update_interval: 3.0      # Azaltıldı: daha sık harita güncelleme (5.0 -> 3.0)
+    map_update_interval: 3.0      # Güvenli değer: 2.0 çok agresif - SLAM Toolbox başlamıyor
     resolution: 0.05
     min_laser_range: 0.0 #for rastering images
     max_laser_range: 20.0 #for rastering images
@@ -39,22 +39,22 @@ slam_toolbox:
     # General Parameters
     use_scan_matching: true
     use_scan_barycenter: true
-    minimum_travel_distance: 0.5
-    minimum_travel_heading: 0.5
+    minimum_travel_distance: 0.3          # Güvenli değer: 0.25 çok agresif
+    minimum_travel_heading: 0.25          # Güvenli değer: 0.2 çok agresif
     scan_buffer_size: 10
     scan_buffer_maximum_scan_distance: 10.0
-    link_match_minimum_response_fine: 0.1  
+    link_match_minimum_response_fine: 0.1    
     link_scan_maximum_distance: 1.5
-    loop_search_maximum_distance: 3.0
+    loop_search_maximum_distance: 5.0     # Güvenli değer: dengeli loop closure araması
     do_loop_closing: true 
     loop_match_minimum_chain_size: 10           
     loop_match_maximum_variance_coarse: 3.0  
-    loop_match_minimum_response_coarse: 0.35    
-    loop_match_minimum_response_fine: 0.45
+    loop_match_minimum_response_coarse: 0.3   # Güvenli değer: dengeli loop closure
+    loop_match_minimum_response_fine: 0.4     # Güvenli değer: dengeli loop closure
 
     # Correlation Parameters - Correlation Parameters
     correlation_search_space_dimension: 0.5
-    correlation_search_space_resolution: 0.01
+    correlation_search_space_resolution: 0.01  # Güvenli değer: 0.008 çok agresif - SLAM Toolbox başlamıyor
     correlation_search_space_smear_deviation: 0.1 
 
     # Correlation Parameters - Loop Closure Parameters

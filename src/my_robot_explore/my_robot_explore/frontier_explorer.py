@@ -100,6 +100,8 @@ class FrontierExplorer(Node):
         # New parameters for advanced features
         self.declare_parameter("use_information_gain", True)
         self.declare_parameter("information_gain_weight", 2.0)  # Weight for information gain vs distance
+        self.declare_parameter("information_gain_min_threshold", 0.0)  # Minimum info gain to use info-gain scoring (fallback threshold)
+        self.declare_parameter("distance_normalization_max", 20.0)  # Max distance for normalization (meters)
         self.declare_parameter("frontier_cluster_distance", 5)  # Pixels - max distance for clustering
         self.declare_parameter("min_cluster_size", 3)  # Minimum cells in a cluster
         
@@ -133,6 +135,8 @@ class FrontierExplorer(Node):
         
         self.use_information_gain = bool(self.get_parameter("use_information_gain").value)
         self.information_gain_weight = float(self.get_parameter("information_gain_weight").value)
+        self.information_gain_min_threshold = float(self.get_parameter("information_gain_min_threshold").value)
+        self.distance_normalization_max = float(self.get_parameter("distance_normalization_max").value)
         self.frontier_cluster_distance = int(self.get_parameter("frontier_cluster_distance").value)
         self.min_cluster_size = int(self.get_parameter("min_cluster_size").value)
         
@@ -394,13 +398,21 @@ class FrontierExplorer(Node):
 
             # Calculate score
             if self.use_information_gain:
-                # Information gain / distance ratio (higher is better)
-                # Normalize: info_gain / (dist + 1.0) to avoid division by zero
-                score = (cluster.information_gain * self.information_gain_weight) / (dist + 1.0)
-                # Bonus for larger clusters
-                score += cluster.size * 0.1
+                # Edge case: Information gain çok düşükse fallback (explore_lite benzeri)
+                # Mevcut scoring'i koruyoruz, sadece guardrail ekliyoruz
+                if cluster.information_gain < self.information_gain_min_threshold:
+                    # Fallback: distance-based scoring (explore_lite yaklaşımı)
+                    score = -dist
+                else:
+                    # Normalized distance for stability (mevcut formülü koruyoruz)
+                    normalized_dist = min(dist, self.distance_normalization_max)
+                    # Information gain / distance ratio (higher is better)
+                    # Mevcut scoring formülü korunuyor - sadece distance normalization eklendi
+                    score = (cluster.information_gain * self.information_gain_weight) / (normalized_dist + 1.0)
+                    # Bonus for larger clusters
+                    score += cluster.size * 0.1
             else:
-                # Simple: closest frontier
+                # Simple: closest frontier (explore_lite fallback - mevcut davranış korunuyor)
                 score = -dist
 
             if score > best_score:
