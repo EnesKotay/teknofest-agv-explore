@@ -15,6 +15,7 @@ ros2 launch my_robot_bringup real_robot_exploration.launch.py serial_port:=/dev/
 
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, TimerAction
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, TextSubstitution, Command
 from launch_ros.actions import Node
@@ -106,6 +107,12 @@ def generate_launch_description():
         description="Laser filter config file"
     )
     
+    declare_use_rviz = DeclareLaunchArgument(
+        "use_rviz",
+        default_value=TextSubstitution(text="false"),  # Varsayılan: kapalı (headless için)
+        description="Launch RViz2 for visualization"
+    )
+    
     # Launch Configurations
     serial_port = LaunchConfiguration("serial_port")
     baud_rate = LaunchConfiguration("baud_rate")
@@ -119,6 +126,7 @@ def generate_launch_description():
     explore_params_file = LaunchConfiguration("explore_params_file")
     rviz_config = LaunchConfiguration("rviz_config")
     laser_filter_config = LaunchConfiguration("laser_filter_config")
+    use_rviz = LaunchConfiguration("use_rviz")
     
     # ---------- Include: real_robot_bringup.launch.py ----------
     # Arduino bridge, robot_state_publisher, odom_tf_broadcaster
@@ -292,13 +300,13 @@ def generate_launch_description():
     ))
     
     nav2_navigation = TimerAction(
-        period=4.0,  # 4 saniye bekle (SLAM hazır olsun)
+        period=8.0,  # 8 saniye bekle (SLAM map frame oluştursun)
         actions=navigation
     )
     
     # ---------- Frontier Explorer ----------
     explore_node = TimerAction(
-        period=6.0,  # 6 saniye bekle (Nav2 hazır olsun)
+        period=12.0,  # 12 saniye bekle (Nav2 ve SLAM hazır olsun)
         actions=[
             Node(
                 package="my_robot_explore",
@@ -310,9 +318,9 @@ def generate_launch_description():
         ]
     )
     
-    # ---------- RViz2 ----------
+    # ---------- RViz2 (Opsiyonel - sadece GUI varsa) ----------
     rviz_node = TimerAction(
-        period=8.0,  # 8 saniye bekle (sistem hazır olsun)
+        period=14.0,  # 14 saniye bekle (sistem hazır olsun)
         actions=[
             Node(
                 package="rviz2",
@@ -320,7 +328,8 @@ def generate_launch_description():
                 name="rviz2",
                 arguments=["-d", rviz_config],
                 parameters=[{"use_sim_time": use_sim_time}],
-                output="screen"
+                output="screen",
+                condition=IfCondition(use_rviz)  # Sadece use_rviz:=true ise başlat
             )
         ]
     )
@@ -339,6 +348,7 @@ def generate_launch_description():
         declare_explore_params,
         declare_rviz_config,
         declare_laser_filter_config,
+        declare_use_rviz,
         declare_lidar_port,
         
         real_robot_bringup,      # 0 saniye - anında başlar

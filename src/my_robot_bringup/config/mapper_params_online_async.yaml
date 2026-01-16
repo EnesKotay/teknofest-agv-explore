@@ -33,13 +33,16 @@ slam_toolbox:
     # Eğer eski haritadan devam etmek isterseniz, aşağıdaki satırları açın:
     # map_file_name: /path/to/map
     # map_start_at_dock: true
-    # map_start_pose: [0.0, 0.0, 0.0]
+    
+    # Initial pose ayarları (map frame oluşturması için) - Teknofest-AGV değeri
+    map_start_pose: [0.0, 0.0, 0.0]  # x, y, theta (radyan)
 
     debug_logging: false
     throttle_scans: 1
     transform_publish_period: 0.02 #if 0 never publishes odometry
-    map_update_interval: 3.0      # Güvenli değer: 2.0 çok agresif - SLAM Toolbox başlamıyor
+    map_update_interval: 5.0      # Teknofest-AGV değeri
     resolution: 0.05
+    min_map_size: 10  # Teknofest-AGV değeri
     min_laser_range: 0.3  # Teknofest-AGV değeri (for rastering images)
     max_laser_range: 10.0  # Teknofest-AGV değeri (for rastering images)
     minimum_time_interval: 0.5
