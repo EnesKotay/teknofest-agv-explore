@@ -11,10 +11,34 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(hardware_interface REQUIRED)
 find_package(pluginlib REQUIRED)
-find_package(libserial REQUIRED)
+
+# libserial - Ubuntu'da CMake config dosyası yok, manuel bulma
+find_library(LIBSERIAL_LIBRARIES
+  NAMES serial
+  PATHS 
+    /usr/lib
+    /usr/lib/aarch64-linux-gnu
+    /usr/lib/arm-linux-gnueabihf
+    /usr/local/lib
+  REQUIRED
+)
+
+find_path(LIBSERIAL_INCLUDE_DIRS
+  NAMES SerialPort.h
+  PATHS 
+    /usr/include
+    /usr/include/libserial
+    /usr/local/include
+    /usr/local/include/libserial
+  REQUIRED
+)
+
+message(STATUS "Found libserial library: ${LIBSERIAL_LIBRARIES}")
+message(STATUS "Found libserial headers: ${LIBSERIAL_INCLUDE_DIRS}")
 
 include_directories(include)
 include_directories(hardware/include)
+include_directories(${LIBSERIAL_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME} SHARED
   hardware/my_robot_system.cpp
@@ -25,8 +49,11 @@ ament_target_dependencies(${PROJECT_NAME}
   rclcpp_lifecycle
   hardware_interface
   pluginlib
-  libserial
 )
+
+# libserial manuel link
+target_link_libraries(${PROJECT_NAME} ${LIBSERIAL_LIBRARIES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${LIBSERIAL_INCLUDE_DIRS})
 
 pluginlib_export_plugin_description_file(hardware_interface my_robot_hardware.xml)
 
@@ -58,14 +85,14 @@ endif()
 ament_export_include_directories(
   include
   hardware/include
+  ${LIBSERIAL_INCLUDE_DIRS}
 )
-ament_export_libraries(${PROJECT_NAME})
+ament_export_libraries(${PROJECT_NAME} ${LIBSERIAL_LIBRARIES})
 ament_export_dependencies(
   rclcpp
   rclcpp_lifecycle
   hardware_interface
   pluginlib
-  libserial
 )
 
 ament_package()
