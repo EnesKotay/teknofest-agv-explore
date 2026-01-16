@@ -158,18 +158,7 @@ hardware_interface::CallbackReturn MyRobotSystem::on_configure(
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-hardware_interface::CallbackReturn MyRobotSystem::on_cleanup(
-  const rclcpp_lifecycle::State & /*previous_state*/)
-{
-  RCLCPP_INFO(rclcpp::get_logger("MyRobotSystem"), "Cleaning up ...please wait...");
-  if (comms_.connected())
-  {
-    comms_.disconnect();
-  }
-  RCLCPP_INFO(rclcpp::get_logger("MyRobotSystem"), "Successfully cleaned up!");
-
-  return hardware_interface::CallbackReturn::SUCCESS;
-}
+// on_cleanup removed in ROS2 Jazzy - cleanup is done in on_deactivate
 
 hardware_interface::CallbackReturn MyRobotSystem::on_activate(
   const rclcpp_lifecycle::State & /*previous_state*/)
@@ -192,6 +181,10 @@ hardware_interface::CallbackReturn MyRobotSystem::on_deactivate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
   RCLCPP_INFO(rclcpp::get_logger("MyRobotSystem"), "Deactivating ...please wait...");
+  if (comms_.connected())
+  {
+    comms_.disconnect();
+  }
   RCLCPP_INFO(rclcpp::get_logger("MyRobotSystem"), "Successfully deactivated!");
 
   return hardware_interface::CallbackReturn::SUCCESS;

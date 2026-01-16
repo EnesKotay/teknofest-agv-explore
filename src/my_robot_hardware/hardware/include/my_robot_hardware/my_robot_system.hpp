@@ -55,7 +55,7 @@ struct Config
 };
 
 public:
-  RCLCPP_SHARED_PTR_DEFINITIONS(MyRobotSystem);
+  RCLCPP_SHARED_PTR_DEFINITIONS(MyRobotSystem)
 
   hardware_interface::CallbackReturn on_init(
     const hardware_interface::HardwareInfo & info) override;
