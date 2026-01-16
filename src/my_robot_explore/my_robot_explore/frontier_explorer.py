@@ -96,7 +96,7 @@ class FrontierExplorer(Node):
         
         self.declare_parameter("return_to_start", True)
         self.declare_parameter("start_position_timeout", 10.0)
-        
+
         # New parameters for advanced features
         self.declare_parameter("use_information_gain", True)
         self.declare_parameter("information_gain_weight", 2.0)  # Weight for information gain vs distance

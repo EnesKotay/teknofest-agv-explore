@@ -74,13 +74,13 @@ NOT: ros2_control entegrasyonu YOK (Micro-ROS kullanıyoruz)
   </joint>
 
   <link name="laser_link">
-    <visual>
+      <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
+        <geometry>
         <cylinder radius="${laser_radius}" length="${laser_length}"/>
-      </geometry>
+        </geometry>
       <material name="black"/>
-    </visual>
+      </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
@@ -107,12 +107,12 @@ NOT: ros2_control entegrasyonu YOK (Micro-ROS kullanıyoruz)
   </joint>
 
   <link name="left_wheel">
-    <collision>
+      <collision>
       <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
-      <geometry>
+        <geometry>
         <cylinder length="${wheel_len}" radius="${wheel_radius}"/>
-      </geometry>
-    </collision>
+        </geometry>
+      </collision>
     <visual>
       <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
       <geometry>
@@ -120,24 +120,24 @@ NOT: ros2_control entegrasyonu YOK (Micro-ROS kullanıyoruz)
       </geometry>
       <material name="black"/>
     </visual>
-    <inertial>
-      <mass value="1.0"/>
-      <origin xyz="0 0 0"/>
+      <inertial>
+        <mass value="1.0"/>
+        <origin xyz="0 0 0"/>
       <inertia 
         ixx="0.01" ixy="0" ixz="0" 
         iyy="0.01" iyz="0" 
         izz="0.01"/>
-    </inertial>
-  </link>
+      </inertial>
+    </link>
 
   <!-- Sağ Teker -->
   <joint name="right_wheel_joint" type="continuous">
-    <parent link="base_link"/>
+      <parent link="base_link"/>
     <child link="right_wheel"/>
     <origin xyz="0 -${base_width/2} 0" rpy="0 0 0"/>
-    <axis xyz="0 1 0"/>
+      <axis xyz="0 1 0"/>
     <dynamics damping="0.2"/>
-  </joint>
+    </joint>
 
   <link name="right_wheel">
     <collision>
