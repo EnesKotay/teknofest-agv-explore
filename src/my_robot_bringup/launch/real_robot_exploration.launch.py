@@ -94,6 +94,12 @@ def generate_launch_description():
         description="RViz config file"
     )
     
+    declare_laser_filter_config = DeclareLaunchArgument(
+        "laser_filter_config",
+        default_value=PathJoinSubstitution([pkg_bringup, "config", "laser_filter.yaml"]),
+        description="Laser filter config file"
+    )
+    
     # Launch Configurations
     serial_port = LaunchConfiguration("serial_port")
     baud_rate = LaunchConfiguration("baud_rate")
@@ -106,6 +112,7 @@ def generate_launch_description():
     slam_params_file = LaunchConfiguration("slam_params_file")
     explore_params_file = LaunchConfiguration("explore_params_file")
     rviz_config = LaunchConfiguration("rviz_config")
+    laser_filter_config = LaunchConfiguration("laser_filter_config")
     
     # ---------- Include: real_robot_bringup.launch.py ----------
     # Arduino bridge, robot_state_publisher, odom_tf_broadcaster
@@ -145,6 +152,25 @@ def generate_launch_description():
                     {"serial_baudrate": 256000},  # RPLIDAR A2 için 256000 baudrate
                     {"frame_id": "laser_link"},
                     {"use_sim_time": use_sim_time},
+                ],
+                output="screen",
+            )
+        ]
+    )
+    
+    # ---------- Laser Filter (Box Filter) ----------
+    # Robot gövdesini ve Karakuri'yi filtreler, sadece gerçek engelleri algılar
+    laser_filter_node = TimerAction(
+        period=1.5,  # 1.5 saniye bekle (LIDAR çalışmaya başlasın)
+        actions=[
+            Node(
+                package="laser_filters",
+                executable="scan_to_scan_filter_chain",
+                name="laser_filter_node",
+                parameters=[laser_filter_config, {"use_sim_time": use_sim_time}],
+                remappings=[
+                    ("scan", "/scan"),  # Orijinal scan topic
+                    ("scan_filtered", "/scan_filtered"),  # Filtrelenmiş scan topic
                 ],
                 output="screen",
             )
@@ -304,10 +330,12 @@ def generate_launch_description():
         declare_slam_params,
         declare_explore_params,
         declare_rviz_config,
+        declare_laser_filter_config,
         declare_lidar_port,
         
         real_robot_bringup,      # 0 saniye - anında başlar
         lidar_node,              # 1 saniye sonra - RPLIDAR A2
+        laser_filter_node,       # 1.5 saniye sonra - Box filter (robot gövdesini filtreler)
         slam_toolbox_launch,     # 2 saniye sonra
         nav2_navigation,         # 4 saniye sonra
         explore_node,            # 6 saniye sonra

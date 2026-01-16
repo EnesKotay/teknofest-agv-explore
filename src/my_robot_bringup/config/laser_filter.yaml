@@ -1,0 +1,11 @@
+scan_filter_chain:
+  - name: zenit_body_filter
+    type: laser_filters/LaserScanBoxFilter
+    params:
+      box_frame: base_link  # LIDAR'ın referans aldığı gövde koordinatı
+      min_x: -0.40          # Arka sınır (75cm/2 + güvenlik payı)
+      max_x: 0.40           # Ön sınır (75cm/2 + güvenlik payı)
+      min_y: -0.35          # Sağ sınır (60cm/2 + güvenlik payı)
+      max_y: 0.35           # Sol sınır (60cm/2 + güvenlik payı)
+      min_z: -0.1           # LIDAR seviyesinin altı
+      max_z: 0.5            # LIDAR seviyesinin üstü (Karakuri profilleri için)
