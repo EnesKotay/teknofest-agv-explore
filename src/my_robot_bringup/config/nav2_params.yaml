@@ -1,3 +1,17 @@
+# ============================================================================
+# Nav2 Navigation Stack Konfigürasyonu
+# ============================================================================
+# Bu dosya Nav2 navigation stack'inin tüm parametrelerini içerir:
+# - AMCL (localization)
+# - Controller Server (motor kontrolü)
+# - Planner Server (path planning)
+# - Behavior Server (spin, backup, wait vb.)
+# - Costmaps (obstacle detection, inflation)
+# - Collision Monitor (güvenlik)
+#
+# ÖNEMLİ: /scan_filtered kullanıyor (laser_filter.yaml ile filtrelenmiş LIDAR)
+# ============================================================================
+
 amcl:
   ros__parameters:
     use_sim_time: true

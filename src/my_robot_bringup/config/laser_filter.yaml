@@ -1,3 +1,18 @@
+# ============================================================================
+# LIDAR Box Filter Konfigürasyonu
+# ============================================================================
+# Bu dosya laser_filters paketinin LaserScanBoxFilter'ını yapılandırır.
+#
+# Ne yapar: Robot gövdesini ve Karakuri platformunu LIDAR verisinden filtreler.
+#           Böylece robot kendini engel olarak algılamaz.
+#
+# Nasıl çalışır: Belirtilen box (kutu) içindeki LIDAR noktaları silinir.
+#                /scan -> /scan_filtered (filtrelenmiş veri)
+#
+# Ölçüler: Robot + Karakuri platform boyutlarına göre ayarlanmıştır.
+#          Box frame: base_link (robot gövdesinin merkezi)
+# ============================================================================
+
 scan_filter_chain:
   - name: zenit_body_filter
     type: laser_filters/LaserScanBoxFilter

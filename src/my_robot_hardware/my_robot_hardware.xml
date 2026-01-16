@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<library path="my_robot_hardware">
+  <class name="my_robot_hardware/MyRobotSystem" type="my_robot_hardware::MyRobotSystem" base_class_type="hardware_interface::SystemInterface">
+    <description>
+      ROS2 Control hardware interface for Arduino-based differential drive robot using ROSArduinoBridge protocol
+    </description>
+  </class>
+</library>

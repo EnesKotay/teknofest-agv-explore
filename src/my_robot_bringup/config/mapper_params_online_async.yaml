@@ -1,3 +1,15 @@
+# ============================================================================
+# SLAM Toolbox Online Async Mapping Konfigürasyonu
+# ============================================================================
+# Bu dosya SLAM Toolbox'ın online async mapping parametrelerini içerir:
+# - Loop closure detection (kapalı döngü algılama)
+# - Scan matching (tarama eşleştirme)
+# - Map update frequency (harita güncelleme sıklığı)
+# - Correlation parameters (korelasyon parametreleri)
+#
+# ÖNEMLİ: /scan_filtered kullanıyor (robot gövdesi filtrelenmiş LIDAR verisi)
+# ============================================================================
+
 slam_toolbox:
   ros__parameters:
 
@@ -28,8 +40,8 @@ slam_toolbox:
     transform_publish_period: 0.02 #if 0 never publishes odometry
     map_update_interval: 3.0      # Güvenli değer: 2.0 çok agresif - SLAM Toolbox başlamıyor
     resolution: 0.05
-    min_laser_range: 0.0 #for rastering images
-    max_laser_range: 20.0 #for rastering images
+    min_laser_range: 0.3  # Teknofest-AGV değeri (for rastering images)
+    max_laser_range: 10.0  # Teknofest-AGV değeri (for rastering images)
     minimum_time_interval: 0.5
     transform_timeout: 2.0
     tf_buffer_duration: 120.0

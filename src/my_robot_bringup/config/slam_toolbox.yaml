@@ -1,3 +1,14 @@
+# ============================================================================
+# SLAM Toolbox Standalone Konfigürasyonu
+# ============================================================================
+# Bu dosya SLAM Toolbox'ın standalone (tek başına) kullanımı için parametreleri içerir.
+#
+# Ne zaman kullanılır: SLAM Toolbox'ı mapper_params_online_async.yaml yerine
+#                      bu config ile başlatmak istediğinizde.
+#
+# ÖNEMLİ: /scan_filtered kullanıyor (robot gövdesi filtrelenmiş LIDAR verisi)
+# ============================================================================
+
 slam_toolbox:
   ros__parameters:
     use_sim_time: true
@@ -15,7 +26,7 @@ slam_toolbox:
     transform_publish_period: 0.02
     map_update_interval: 2.0
     resolution: 0.05
-    max_laser_range: 8.0
+    max_laser_range: 10.0  # Teknofest-AGV değeri
     minimum_time_interval: 0.0
 
     # Loop closure / scan matching (başlangıç için güvenli)

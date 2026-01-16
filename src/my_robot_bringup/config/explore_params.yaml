@@ -1,3 +1,20 @@
+# ============================================================================
+# Frontier Explorer Parametreleri
+# ============================================================================
+# Bu dosya frontier_explorer.py node'unun parametrelerini içerir.
+#
+# Ne yapar: Otonom keşif algoritması - haritadaki keşfedilmemiş alanları bulur
+#           ve robotu oraya yönlendirir (frontier-based exploration).
+#
+# Ana özellikler:
+# - Information Gain: Büyük keşfedilmemiş alana yakın frontierleri önceliklendirir
+# - Frontier Clustering: Yakın frontierleri gruplar
+# - Stuck Detection: Robot takılırsa farklı yöne yönlendirir
+# - Return-to-Start: Harita tamamlanınca başlangıca döner
+#
+# Optimize edildi: Teknofest yarışması için daire çizme ve harita kayması önlendi
+# ============================================================================
+
 frontier_explorer:
   ros__parameters:
     use_sim_time: true

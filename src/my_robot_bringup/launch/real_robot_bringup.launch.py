@@ -57,6 +57,12 @@ def generate_launch_description():
         description="Encoder çözünürlüğü (bir turdaki tick sayısı)"
     )
     
+    declare_timeout = DeclareLaunchArgument(
+        "timeout",
+        default_value=TextSubstitution(text="1.0"),
+        description="Serial port timeout (saniye)"
+    )
+    
     declare_use_sim_time = DeclareLaunchArgument(
         "use_sim_time",
         default_value=TextSubstitution(text="false"),
@@ -68,6 +74,7 @@ def generate_launch_description():
     wheel_separation = LaunchConfiguration("wheel_separation")
     wheel_radius = LaunchConfiguration("wheel_radius")
     encoder_counts_per_rev = LaunchConfiguration("encoder_counts_per_rev")
+    timeout = LaunchConfiguration("timeout")
     use_sim_time = LaunchConfiguration("use_sim_time")
     
     # ---------- Arduino Bridge Node ----------
@@ -82,6 +89,7 @@ def generate_launch_description():
             {"use_sim_time": use_sim_time},
             {"serial_port": serial_port},
             {"baud_rate": baud_rate},
+            {"timeout": timeout},
             {"wheel_separation": wheel_separation},
             {"wheel_radius": wheel_radius},
             {"encoder_counts_per_rev": encoder_counts_per_rev},
@@ -131,6 +139,7 @@ def generate_launch_description():
         declare_wheel_separation,
         declare_wheel_radius,
         declare_encoder_counts_per_rev,
+        declare_timeout,
         declare_use_sim_time,
         arduino_bridge,
         robot_state_publisher,

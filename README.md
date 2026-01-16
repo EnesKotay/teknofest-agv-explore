@@ -94,12 +94,26 @@ ros2 launch my_robot_bringup real_robot_exploration.launch.py \
 ```
 my_robot_explore/
 ├── src/
-│   ├── my_robot_bringup/          # Launch dosyaları ve config
-│   ├── my_robot_description/      # URDF robot tanımı
-│   └── my_robot_explore/          # Frontier explorer node
-├── docs/                          # Dokümantasyon
-└── README.md
+│   ├── my_robot_bringup/          # Launch dosyaları ve config dosyaları
+│   │   ├── launch/                # ROS2 launch dosyaları
+│   │   ├── config/                # Nav2, SLAM, Explorer parametreleri
+│   │   └── arduino/               # Arduino firmware ve dokümantasyon
+│   ├── my_robot_description/      # URDF robot tanımı ve Gazebo modelleri
+│   │   ├── urdf/                  # Robot URDF/Xacro dosyaları
+│   │   ├── ros2_control/          # ROS2 Control konfigürasyonu
+│   │   └── worlds/                # Gazebo dünya dosyaları
+│   ├── my_robot_explore/          # Python node'lar (explorer, bridge, odom)
+│   │   └── my_robot_explore/      # Frontier explorer, Arduino bridge
+│   └── my_robot_hardware/         # ROS2 Control C++ hardware interface
+│       └── hardware/              # Arduino serial iletişim (C++)
+└── README.md                      # Bu dosya
 ```
+
+**Her paketin detaylı açıklaması için kendi README.md dosyasına bakın:**
+- `src/my_robot_bringup/README.md` - Launch ve config dosyaları
+- `src/my_robot_explore/README.md` - Python node'lar (explorer, bridge)
+- `src/my_robot_description/README.md` - URDF ve Gazebo modelleri
+- `src/my_robot_hardware/README.md` - ROS2 Control C++ hardware
 
 
 ## 🔧 Konfigürasyon

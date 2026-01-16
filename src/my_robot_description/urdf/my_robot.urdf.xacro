@@ -14,6 +14,9 @@ NOT: ros2_control entegrasyonu YOK (Micro-ROS kullanıyoruz)
   <!-- Import materials -->
   <xacro:include filename="$(find my_robot_description)/urdf/my_robot.materials.xacro" />
 
+  <!-- Import ROS2 Control -->
+  <xacro:include filename="$(find my_robot_description)/ros2_control/my_robot.ros2_control.xacro" />
+
   <!-- Robot ölçüleri (Gerçek robot ölçüleri) -->
   <xacro:property name="PI" value="3.1415926535897931"/>
   <xacro:property name="base_width" value="0.55" />
@@ -193,5 +196,8 @@ NOT: ros2_control entegrasyonu YOK (Micro-ROS kullanıyoruz)
         izz="0.001"/>
     </inertial>
   </link>
+
+  <!-- ROS2 Control Hardware Interface -->
+  <xacro:my_robot_hardware name="MyRobotHardware"/>
 
 </robot>
