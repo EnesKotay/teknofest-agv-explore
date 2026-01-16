@@ -21,6 +21,7 @@ setup(
         'console_scripts': [
             'frontier_explorer = my_robot_explore.frontier_explorer:main',
             'odom_tf_broadcaster = my_robot_explore.odom_tf_broadcaster:main',
+            'arduino_bridge = my_robot_explore.arduino_bridge:main',
         ],
     },
 )

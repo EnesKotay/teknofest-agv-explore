@@ -8,7 +8,7 @@ ROS2 Jazzy tabanlı otonom keşif sistemi. Frontier-based exploration algoritmas
 - **SLAM:** SLAM Toolbox ile gerçek zamanlı harita oluşturma
 - **Navigasyon:** Nav2 stack ile otonom navigasyon
 - **Return-to-Start:** Keşif tamamlandıktan sonra başlangıç noktasına dönme
-- **Gerçek Robot Desteği:** STM32F4 + Micro-ROS entegrasyonu
+- **Gerçek Robot Desteği:** Arduino + Serial Port haberleşme (ROSArduinoBridge protokolü)
 - **LIDAR Desteği:** RPLIDAR A2 entegrasyonu
 
 ## 📋 Gereksinimler
@@ -18,9 +18,10 @@ ROS2 Jazzy tabanlı otonom keşif sistemi. Frontier-based exploration algoritmas
 - **Donanım (Simülasyon):** Gazebo Gz
 - **Donanım (Gerçek Robot):**
   - Raspberry Pi 5 (Ubuntu 24.04 Server)
-  - STM32F4 (F401 veya F446)
+  - Arduino (Mega 2560/Nano vb.) - ROSArduinoBridge firmware ile
   - RPLIDAR A2
   - Differential drive robot
+  - Encoder'lar (motor kontrol için)
 
 ## 📦 Kurulum
 
@@ -64,21 +65,29 @@ source install/setup.bash
 ros2 launch my_robot_bringup autonomous_exploration.launch.py
 ```
 
-### Gerçek Robot
+### Gerçek Robot (Arduino)
 
 ```bash
-# Temel bringup (STM32 + LIDAR)
+# Temel bringup (Arduino + LIDAR)
+# Önce pyserial'i kurun: sudo apt install python3-serial
 ros2 launch my_robot_bringup real_robot_bringup.launch.py \
-    serial_port:=/dev/ttyACM0 \
-    baud_rate:=460800 \
-    lidar_port:=/dev/ttyUSB0
+    serial_port:=/dev/ttyUSB0 \
+    baud_rate:=57600 \
+    wheel_separation:=0.30 \
+    wheel_radius:=0.05 \
+    encoder_counts_per_rev:=3600
 
 # Full system (Otonom keşif)
 ros2 launch my_robot_bringup real_robot_exploration.launch.py \
-    serial_port:=/dev/ttyACM0 \
-    baud_rate:=460800 \
-    lidar_port:=/dev/ttyUSB0
+    serial_port:=/dev/ttyUSB0 \
+    baud_rate:=57600 \
+    wheel_separation:=0.30 \
+    wheel_radius:=0.05 \
+    encoder_counts_per_rev:=3600 \
+    lidar_port:=/dev/ttyUSB1
 ```
+
+**Not:** Arduino için `ROSArduinoBridge` protokolü kullanılır. Detaylar için `src/my_robot_bringup/arduino/ARDUINO_SERIAL_PROTOCOL.md` dosyasına bakın.
 
 ## 📁 Proje Yapısı
 
@@ -139,7 +148,7 @@ Bu proje Teknofest yarışması için geliştirilmiştir.
 ## 👥 Ekip
 
 - **Sistem Koordinatörü:** Sistem entegrasyonu ve test
-- **STM32 Geliştirici:** STM32 firmware ve Micro-ROS
+- **Arduino Geliştirici:** Arduino firmware ve ROSArduinoBridge protokolü
 - **LIDAR Geliştirici:** LIDAR entegrasyonu
 
 ## 🙏 Teşekkürler

@@ -1,16 +1,16 @@
 """
 Gerçek Robot Otonom Keşif Launch Dosyası
-STM32F4 + Micro-ROS + LIDAR
+Arduino + Serial Port + LIDAR
 
 Bu launch dosyası:
-1. real_robot_bringup.launch.py'yi include eder (Micro-ROS, TF, vb.)
+1. real_robot_bringup.launch.py'yi include eder (Arduino bridge, TF, vb.)
 2. SLAM Toolbox ile harita oluşturur
 3. Nav2 ile navigasyon sağlar
 4. frontier_explorer ile otonom keşif yapar
 5. RViz2 ile görselleştirme yapar
 
 Kullanım:
-ros2 launch my_robot_bringup real_robot_exploration.launch.py
+ros2 launch my_robot_bringup real_robot_exploration.launch.py serial_port:=/dev/ttyUSB0
 """
 
 from launch import LaunchDescription
@@ -30,14 +30,32 @@ def generate_launch_description():
     # Launch Arguments
     declare_serial_port = DeclareLaunchArgument(
         "serial_port",
-        default_value=TextSubstitution(text="/dev/ttyACM0"),
-        description="STM32 Serial port (ST-Link Virtual COM Port)"
+        default_value=TextSubstitution(text="/dev/ttyUSB0"),
+        description="Arduino Serial port (/dev/ttyUSB0, /dev/ttyACM0, vb.)"
     )
     
     declare_baud_rate = DeclareLaunchArgument(
         "baud_rate",
-        default_value=TextSubstitution(text="460800"),
-        description="Serial baud rate for Micro-ROS"
+        default_value=TextSubstitution(text="57600"),
+        description="Serial baud rate (57600 önerilir - ROSArduinoBridge varsayılanı)"
+    )
+    
+    declare_wheel_separation = DeclareLaunchArgument(
+        "wheel_separation",
+        default_value=TextSubstitution(text="0.30"),
+        description="Tekerlekler arası mesafe (metre)"
+    )
+    
+    declare_wheel_radius = DeclareLaunchArgument(
+        "wheel_radius",
+        default_value=TextSubstitution(text="0.05"),
+        description="Tekerlek yarıçapı (metre)"
+    )
+    
+    declare_encoder_counts_per_rev = DeclareLaunchArgument(
+        "encoder_counts_per_rev",
+        default_value=TextSubstitution(text="3600"),
+        description="Encoder çözünürlüğü (bir turdaki tick sayısı)"
     )
     
     declare_use_sim_time = DeclareLaunchArgument(
@@ -79,6 +97,9 @@ def generate_launch_description():
     # Launch Configurations
     serial_port = LaunchConfiguration("serial_port")
     baud_rate = LaunchConfiguration("baud_rate")
+    wheel_separation = LaunchConfiguration("wheel_separation")
+    wheel_radius = LaunchConfiguration("wheel_radius")
+    encoder_counts_per_rev = LaunchConfiguration("encoder_counts_per_rev")
     use_sim_time = LaunchConfiguration("use_sim_time")
     autostart = LaunchConfiguration("autostart")
     nav2_params_file = LaunchConfiguration("nav2_params_file")
@@ -87,7 +108,7 @@ def generate_launch_description():
     rviz_config = LaunchConfiguration("rviz_config")
     
     # ---------- Include: real_robot_bringup.launch.py ----------
-    # Micro-ROS agent, robot_state_publisher, odom_tf_broadcaster
+    # Arduino bridge, robot_state_publisher, odom_tf_broadcaster
     real_robot_bringup = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution([pkg_bringup, "launch", "real_robot_bringup.launch.py"])
@@ -95,15 +116,19 @@ def generate_launch_description():
         launch_arguments={
             "serial_port": serial_port,
             "baud_rate": baud_rate,
+            "wheel_separation": wheel_separation,
+            "wheel_radius": wheel_radius,
+            "encoder_counts_per_rev": encoder_counts_per_rev,
             "use_sim_time": use_sim_time,
         }.items(),
     )
     
     # ---------- LIDAR Node (RPLIDAR A2) ----------
+    # Not: Arduino /dev/ttyUSB0 ise, LIDAR genellikle /dev/ttyUSB1 olur
     declare_lidar_port = DeclareLaunchArgument(
         "lidar_port",
-        default_value=TextSubstitution(text="/dev/ttyUSB0"),
-        description="RPLIDAR A2 USB port"
+        default_value=TextSubstitution(text="/dev/ttyUSB1"),
+        description="RPLIDAR A2 USB port (Arduino farklı port'ta olabilir)"
     )
     
     lidar_port = LaunchConfiguration("lidar_port")
@@ -270,6 +295,9 @@ def generate_launch_description():
     return LaunchDescription([
         declare_serial_port,
         declare_baud_rate,
+        declare_wheel_separation,
+        declare_wheel_radius,
+        declare_encoder_counts_per_rev,
         declare_use_sim_time,
         declare_autostart,
         declare_nav2_params,

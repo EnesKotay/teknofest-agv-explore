@@ -1,6 +1,6 @@
 """
-Gerçek Robot Bringup Launch Dosyası
-Arduino ile seri port haberleşme (ROSArduinoBridge protokolü)
+Arduino Robot Bringup Launch Dosyası
+Seri port üzerinden Arduino ile haberleşme (ROSArduinoBridge protokolü)
 
 Bu launch dosyası:
 1. arduino_bridge node'unu başlatır (cmd_vel -> motor komutları, encoder -> odometry)
@@ -8,7 +8,7 @@ Bu launch dosyası:
 3. Odometry TF transform ekler
 
 Kullanım:
-ros2 launch my_robot_bringup real_robot_bringup.launch.py serial_port:=/dev/ttyUSB0
+ros2 launch my_robot_bringup arduino/arduino_robot_bringup.launch.py serial_port:=/dev/ttyUSB0
 """
 
 from launch import LaunchDescription
@@ -25,51 +25,51 @@ def generate_launch_description():
     pkg_bringup = FindPackageShare("my_robot_bringup")
     pkg_desc = FindPackageShare("my_robot_description")
     pkg_explore = FindPackageShare("my_robot_explore")
-    
+
     # Launch Arguments
     declare_serial_port = DeclareLaunchArgument(
         "serial_port",
         default_value=TextSubstitution(text="/dev/ttyUSB0"),
         description="Arduino Serial port (/dev/ttyUSB0, /dev/ttyACM0, vb.)"
     )
-    
+
     declare_baud_rate = DeclareLaunchArgument(
         "baud_rate",
         default_value=TextSubstitution(text="57600"),
         description="Serial baud rate (57600 önerilir - ROSArduinoBridge varsayılanı)"
     )
-    
+
     declare_wheel_separation = DeclareLaunchArgument(
         "wheel_separation",
         default_value=TextSubstitution(text="0.30"),
         description="Tekerlekler arası mesafe (metre)"
     )
-    
+
     declare_wheel_radius = DeclareLaunchArgument(
         "wheel_radius",
         default_value=TextSubstitution(text="0.05"),
         description="Tekerlek yarıçapı (metre)"
     )
-    
+
     declare_encoder_counts_per_rev = DeclareLaunchArgument(
         "encoder_counts_per_rev",
         default_value=TextSubstitution(text="3600"),
         description="Encoder çözünürlüğü (bir turdaki tick sayısı)"
     )
-    
+
     declare_use_sim_time = DeclareLaunchArgument(
         "use_sim_time",
         default_value=TextSubstitution(text="false"),
         description="Use simulation time"
     )
-    
+
     serial_port = LaunchConfiguration("serial_port")
     baud_rate = LaunchConfiguration("baud_rate")
     wheel_separation = LaunchConfiguration("wheel_separation")
     wheel_radius = LaunchConfiguration("wheel_radius")
     encoder_counts_per_rev = LaunchConfiguration("encoder_counts_per_rev")
     use_sim_time = LaunchConfiguration("use_sim_time")
-    
+
     # ---------- Arduino Bridge Node ----------
     # /cmd_vel'i dinler, motor komutları gönderir
     # Encoder verilerini okur, /odom yayınlar
@@ -91,14 +91,14 @@ def generate_launch_description():
             {"publish_odom_tf": False},  # odom_tf_broadcaster kullanılacak
         ],
     )
-    
+
     # ---------- Robot State Publisher (URDF -> TF) ----------
     urdf_xacro_path = PathJoinSubstitution([pkg_desc, "urdf", "my_robot.urdf.xacro"])
     robot_desc = ParameterValue(
         Command(["xacro", " ", urdf_xacro_path]),
         value_type=str
     )
-    
+
     robot_state_publisher = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
@@ -109,7 +109,7 @@ def generate_launch_description():
             {"robot_description": robot_desc}
         ],
     )
-    
+
     # ---------- Dynamic TF: odom -> base_footprint ----------
     # arduino_bridge'den gelen /odom topic'inden TF yayınlar
     odom_tf_broadcaster = Node(
@@ -124,7 +124,7 @@ def generate_launch_description():
             {"base_frame": "base_footprint"},
         ],
     )
-    
+
     return LaunchDescription([
         declare_serial_port,
         declare_baud_rate,

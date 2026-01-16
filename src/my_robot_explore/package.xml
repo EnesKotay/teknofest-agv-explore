@@ -14,6 +14,7 @@
   <depend>tf2_ros</depend>
   <depend>visualization_msgs</depend>
   <depend>std_msgs</depend>
+  <!-- pyserial için: pip install pyserial veya apt install python3-serial -->
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
