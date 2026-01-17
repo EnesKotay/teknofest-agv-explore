@@ -13,25 +13,40 @@ find_package(hardware_interface REQUIRED)
 find_package(pluginlib REQUIRED)
 
 # libserial - Ubuntu'da CMake config dosyası yok, manuel bulma
+# Önce standart yolları dene
 find_library(LIBSERIAL_LIBRARIES
   NAMES serial
   PATHS 
-    /usr/lib
+    /usr/lib/x86_64-linux-gnu
     /usr/lib/aarch64-linux-gnu
     /usr/lib/arm-linux-gnueabihf
+    /usr/lib
     /usr/local/lib
-  REQUIRED
 )
 
 find_path(LIBSERIAL_INCLUDE_DIRS
   NAMES SerialPort.h
   PATHS 
-    /usr/include
     /usr/include/libserial
-    /usr/local/include
+    /usr/include
     /usr/local/include/libserial
-  REQUIRED
+    /usr/local/include
 )
+
+if(NOT LIBSERIAL_LIBRARIES OR NOT LIBSERIAL_INCLUDE_DIRS)
+  message(FATAL_ERROR 
+    "libserial not found!\n"
+    "Please install: sudo apt install libserial-dev\n"
+    "Library search paths tried:\n"
+    "  - /usr/lib/x86_64-linux-gnu (x86_64)\n"
+    "  - /usr/lib/aarch64-linux-gnu (Raspberry Pi 5 - 64-bit)\n"
+    "  - /usr/lib/arm-linux-gnueabihf (Raspberry Pi 4 - 32-bit)\n"
+    "  - /usr/lib, /usr/local/lib\n"
+    "Include search paths tried:\n"
+    "  - /usr/include/libserial, /usr/include\n"
+    "  - /usr/local/include/libserial, /usr/local/include"
+  )
+endif()
 
 message(STATUS "Found libserial library: ${LIBSERIAL_LIBRARIES}")
 message(STATUS "Found libserial headers: ${LIBSERIAL_INCLUDE_DIRS}")

@@ -1,13 +1,13 @@
 """
 Gerçek Robot Otonom Keşif Launch Dosyası
-Arduino + Serial Port + LIDAR
+Raspberry Pi için optimize edilmiş (Headless - GUI yok)
 
 Bu launch dosyası:
-1. real_robot_bringup.launch.py'yi include eder (Arduino bridge, TF, vb.)
+1. real_robot_ros2_control.launch.py'yi include eder (ROS2 Control hardware interface, TF, vb.)
 2. SLAM Toolbox ile harita oluşturur
 3. Nav2 ile navigasyon sağlar
 4. frontier_explorer ile otonom keşif yapar
-5. RViz2 ile görselleştirme yapar
+5. RViz2 opsiyonel (varsayılan: kapalı - headless için)
 
 Kullanım:
 ros2 launch my_robot_bringup real_robot_exploration.launch.py serial_port:=/dev/ttyUSB0
@@ -95,22 +95,28 @@ def generate_launch_description():
         description="Exploration params yaml"
     )
     
-    declare_rviz_config = DeclareLaunchArgument(
-        "rviz_config",
-        default_value=PathJoinSubstitution([pkg_bringup, "rviz", "exploration.rviz"]),
-        description="RViz config file"
-    )
-    
     declare_laser_filter_config = DeclareLaunchArgument(
         "laser_filter_config",
         default_value=PathJoinSubstitution([pkg_bringup, "config", "laser_filter.yaml"]),
         description="Laser filter config file"
     )
     
+    declare_ekf_config = DeclareLaunchArgument(
+        "ekf_config_file",
+        default_value=PathJoinSubstitution([pkg_bringup, "config", "ekf.yaml"]),
+        description="EKF config file"
+    )
+    
     declare_use_rviz = DeclareLaunchArgument(
         "use_rviz",
-        default_value=TextSubstitution(text="false"),  # Varsayılan: kapalı (headless için)
-        description="Launch RViz2 for visualization"
+        default_value=TextSubstitution(text="false"),  # Varsayılan: kapalı (Raspberry Pi headless için)
+        description="Launch RViz2 for visualization (requires GUI/X11 forwarding)"
+    )
+    
+    declare_rviz_config = DeclareLaunchArgument(
+        "rviz_config",
+        default_value=PathJoinSubstitution([pkg_bringup, "rviz", "exploration.rviz"]),
+        description="RViz config file (only used if use_rviz:=true)"
     )
     
     # Launch Configurations
@@ -124,24 +130,20 @@ def generate_launch_description():
     nav2_params_file = LaunchConfiguration("nav2_params_file")
     slam_params_file = LaunchConfiguration("slam_params_file")
     explore_params_file = LaunchConfiguration("explore_params_file")
-    rviz_config = LaunchConfiguration("rviz_config")
     laser_filter_config = LaunchConfiguration("laser_filter_config")
+    ekf_config_file = LaunchConfiguration("ekf_config_file")
     use_rviz = LaunchConfiguration("use_rviz")
+    rviz_config = LaunchConfiguration("rviz_config")
     
-    # ---------- Include: real_robot_bringup.launch.py ----------
-    # Arduino bridge, robot_state_publisher, odom_tf_broadcaster
-    real_robot_bringup = IncludeLaunchDescription(
+    # ---------- Include: real_robot_ros2_control.launch.py ----------
+    # ROS2 Control hardware interface, robot_state_publisher, diff_drive_controller
+    # Teknofest-AGV ile uyumlu (Raspberry Pi 5 + ROS2 Jazzy)
+    real_robot_ros2_control = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            PathJoinSubstitution([pkg_bringup, "launch", "real_robot_bringup.launch.py"])
+            PathJoinSubstitution([pkg_bringup, "launch", "real_robot_ros2_control.launch.py"])
         ),
         launch_arguments={
-            "serial_port": serial_port,
-            "baud_rate": baud_rate,
-            "wheel_separation": wheel_separation,
-            "wheel_radius": wheel_radius,
-            "encoder_counts_per_rev": encoder_counts_per_rev,
-            "timeout": LaunchConfiguration("timeout"),
-            "use_sim_time": use_sim_time,
+            "device": serial_port,  # ROS2 Control'de "device" parametresi kullanılıyor
         }.items(),
     )
     
@@ -192,9 +194,25 @@ def generate_launch_description():
         ]
     )
     
+    # ---------- EKF (Extended Kalman Filter) ----------
+    # Odometry ve IMU verilerini birleştirir, daha doğru pozisyon tahmini sağlar
+    # Teknofest-AGV'de kullanılıyor
+    ekf_node = TimerAction(
+        period=3.0,  # 3 saniye bekle (ROS2 Control ve odometry hazır olsun)
+        actions=[
+            Node(
+                package="robot_localization",
+                executable="ekf_node",
+                name="ekf_filter_node",
+                output="screen",
+                parameters=[ekf_config_file, {"use_sim_time": use_sim_time}],
+            )
+        ]
+    )
+    
     # ---------- SLAM Toolbox ----------
     slam_toolbox_launch = TimerAction(
-        period=2.0,  # 2 saniye bekle (TF tree hazır olsun)
+        period=4.0,  # 4 saniye bekle (TF tree ve EKF hazır olsun)
         actions=[
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
@@ -300,13 +318,13 @@ def generate_launch_description():
     ))
     
     nav2_navigation = TimerAction(
-        period=8.0,  # 8 saniye bekle (SLAM map frame oluştursun)
+        period=10.0,  # 10 saniye bekle (SLAM map frame oluştursun, EKF hazır olsun)
         actions=navigation
     )
     
     # ---------- Frontier Explorer ----------
     explore_node = TimerAction(
-        period=12.0,  # 12 saniye bekle (Nav2 ve SLAM hazır olsun)
+        period=14.0,  # 14 saniye bekle (Nav2, SLAM ve EKF hazır olsun)
         actions=[
             Node(
                 package="my_robot_explore",
@@ -318,9 +336,11 @@ def generate_launch_description():
         ]
     )
     
-    # ---------- RViz2 (Opsiyonel - sadece GUI varsa) ----------
+    # ---------- RViz2 (Opsiyonel - sadece GUI/X11 forwarding varsa) ----------
+    # Raspberry Pi headless için varsayılan: kapalı
+    # GUI erişimi varsa: use_rviz:=true ile başlatılabilir
     rviz_node = TimerAction(
-        period=14.0,  # 14 saniye bekle (sistem hazır olsun)
+        period=16.0,  # 16 saniye bekle (tüm sistem hazır olsun)
         actions=[
             Node(
                 package="rviz2",
@@ -335,6 +355,7 @@ def generate_launch_description():
     )
     
     return LaunchDescription([
+        # Launch Arguments
         declare_serial_port,
         declare_baud_rate,
         declare_wheel_separation,
@@ -346,16 +367,29 @@ def generate_launch_description():
         declare_nav2_params,
         declare_slam_params,
         declare_explore_params,
-        declare_rviz_config,
         declare_laser_filter_config,
+        declare_ekf_config,
         declare_use_rviz,
+        declare_rviz_config,
         declare_lidar_port,
         
-        real_robot_bringup,      # 0 saniye - anında başlar
-        lidar_node,              # 1 saniye sonra - RPLIDAR A2
-        laser_filter_node,       # 1.5 saniye sonra - Box filter (robot gövdesini filtreler)
-        slam_toolbox_launch,     # 2 saniye sonra
-        nav2_navigation,         # 4 saniye sonra
-        explore_node,            # 6 saniye sonra
-        rviz_node,               # 8 saniye sonra
+        # Robot Control (ROS2 Control)
+        real_robot_ros2_control,      # 0 saniye - anında başlar
+        
+        # Sensors
+        lidar_node,                    # 1 saniye sonra - RPLIDAR A2
+        laser_filter_node,             # 1.5 saniye sonra - Box filter (robot gövdesini filtreler)
+        
+        # Localization
+        ekf_node,                      # 3 saniye sonra - EKF (odometry + IMU fusion)
+        
+        # SLAM & Navigation
+        slam_toolbox_launch,           # 4 saniye sonra - SLAM Toolbox
+        nav2_navigation,               # 10 saniye sonra - Nav2 Navigation Stack
+        
+        # Exploration
+        explore_node,                  # 14 saniye sonra - Frontier Explorer
+        
+        # Visualization (Opsiyonel - varsayılan: kapalı)
+        rviz_node,                     # 16 saniye sonra - Sadece use_rviz:=true ise
     ])
