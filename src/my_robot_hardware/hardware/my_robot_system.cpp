@@ -221,10 +221,15 @@ hardware_interface::return_type MyRobotSystem::write(
     return hardware_interface::return_type::ERROR;
   }
 
-  int motor_l_counts_per_loop = wheel_l_.cmd / wheel_l_.rads_per_count / cfg_.loop_rate;
-  int motor_r_counts_per_loop = wheel_r_.cmd / wheel_r_.rads_per_count / cfg_.loop_rate;
+  // Arduino PID_RATE = 30 Hz, TargetTicksPerFrame = ticks per PID frame (33.33ms)
+  // Convert rad/s to ticks per PID frame:
+  // ticks_per_second = cmd (rad/s) / rads_per_count (rad/tick) = ticks/s
+  // ticks_per_frame = ticks_per_second / PID_RATE (30 Hz)
+  const int ARDUINO_PID_RATE = 30;  // Arduino firmware'de tanımlı PID_RATE
+  int motor_l_counts_per_frame = (wheel_l_.cmd / wheel_l_.rads_per_count) / ARDUINO_PID_RATE;
+  int motor_r_counts_per_frame = (wheel_r_.cmd / wheel_r_.rads_per_count) / ARDUINO_PID_RATE;
   
-  comms_.set_motor_values(motor_l_counts_per_loop, motor_r_counts_per_loop);
+  comms_.set_motor_values(motor_l_counts_per_frame, motor_r_counts_per_frame);
   return hardware_interface::return_type::OK;
 }
 

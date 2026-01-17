@@ -27,8 +27,8 @@ ekf_filter_node:
                   true, false, false]   # Linear acceleration x, y, z (sadece x)
     imu0_differential: false
 
-    # Odometry (diff_drive_controller'dan geliyor)
-    odom0: /diff_drive_controller/odom
+    # Odometry (diff_drive_controller'dan geliyor, launch'ta /odom'a remap ediliyor)
+    odom0: /odom
     odom0_config: [false, false, false,  # Position x, y, z
                    false, false, true,   # Orientation roll, pitch, yaw (sadece yaw)
                    true, true, false,    # Velocity x, y, z (sadece x, y)

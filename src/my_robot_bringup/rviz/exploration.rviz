@@ -94,7 +94,7 @@ Visualization Manager:
                 caster_wheel_link:
                   {}
                 laser_link:
-                  {}
+                    {}
                 left_wheel_link:
                   {}
                 right_wheel_link:

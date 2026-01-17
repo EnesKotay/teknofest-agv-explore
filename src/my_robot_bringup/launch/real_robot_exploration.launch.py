@@ -9,6 +9,9 @@ Bu launch dosyası:
 4. frontier_explorer ile otonom keşif yapar
 5. RViz2 opsiyonel (varsayılan: kapalı - headless için)
 
+⚠️ ÖNEMLİ: Bu launch ROS2 Control kullanır, arduino_bridge.py KULLANMAZ!
+           ASLA arduino_bridge.py ile birlikte çalıştırmayın (serial port çakışması)!
+
 Kullanım:
 ros2 launch my_robot_bringup real_robot_exploration.launch.py serial_port:=/dev/ttyUSB0
 """
@@ -43,19 +46,19 @@ def generate_launch_description():
     
     declare_wheel_separation = DeclareLaunchArgument(
         "wheel_separation",
-        default_value=TextSubstitution(text="0.30"),
+        default_value=TextSubstitution(text="0.43"),  # Teknofest-AGV değeri (gerçek robot ölçüsü)
         description="Tekerlekler arası mesafe (metre)"
     )
     
     declare_wheel_radius = DeclareLaunchArgument(
         "wheel_radius",
-        default_value=TextSubstitution(text="0.05"),
+        default_value=TextSubstitution(text="0.050"),  # Teknofest-AGV değeri (gerçek robot ölçüsü)
         description="Tekerlek yarıçapı (metre)"
     )
     
     declare_encoder_counts_per_rev = DeclareLaunchArgument(
         "encoder_counts_per_rev",
-        default_value=TextSubstitution(text="3600"),
+        default_value=TextSubstitution(text="4000"),  # Teknofest-AGV değeri (gerçek encoder çözünürlüğü)
         description="Encoder çözünürlüğü (bir turdaki tick sayısı)"
     )
     

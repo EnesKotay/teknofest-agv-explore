@@ -170,4 +170,3 @@ Bu proje Teknofest yarışması için geliştirilmiştir.
 - ROS2 topluluğu
 - SLAM Toolbox geliştiricileri
 - Nav2 geliştiricileri
-- Micro-ROS topluluğu

@@ -9,6 +9,9 @@ Bu launch dosyası:
 4. Robot state publisher başlatır (URDF -> TF)
 5. Joint state broadcaster spawn eder
 
+⚠️ ÖNEMLİ: Bu launch ROS2 Control kullanır, arduino_bridge.py KULLANMAZ!
+           ASLA arduino_bridge.py ile birlikte çalıştırmayın (serial port çakışması)!
+
 Kullanım:
 ros2 launch my_robot_bringup real_robot_ros2_control.launch.py device:=/dev/ttyUSB0
 """
@@ -36,12 +39,14 @@ def generate_launch_description():
     
     device = LaunchConfiguration("device")
     
-    # URDF dosyasını xacro ile oluştur
+    # URDF dosyasını xacro ile oluştur (device parametresi ile)
     robot_description_content = Command(
         [
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
             PathJoinSubstitution([pkg_desc, "urdf", "my_robot.urdf.xacro"]),
+            " device:=",
+            device,  # Launch'tan gelen device parametresi
         ]
     )
     robot_description = {"robot_description": robot_description_content}
@@ -60,6 +65,7 @@ def generate_launch_description():
         output="both",
         remappings=[
             ("/diff_drive_controller/cmd_vel_unstamped", "/cmd_vel"),
+            ("/diff_drive_controller/odom", "/odom"),  # Nav2 ve diğer node'lar /odom bekliyor
         ],
     )
     

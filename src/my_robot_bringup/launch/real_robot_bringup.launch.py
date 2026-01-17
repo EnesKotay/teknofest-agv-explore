@@ -7,6 +7,10 @@ Bu launch dosyası:
 2. robot_state_publisher başlatır (URDF -> TF)
 3. Odometry TF transform ekler
 
+⚠️ ÖNEMLİ: Bu launch arduino_bridge.py kullanır, ROS2 Control KULLANMAZ!
+           ASLA ROS2 Control ile birlikte çalıştırmayın (serial port çakışması)!
+           Bu launch sadece test amaçlıdır, production için ROS2 Control kullanın!
+
 Kullanım:
 ros2 launch my_robot_bringup real_robot_bringup.launch.py serial_port:=/dev/ttyUSB0
 """
@@ -41,19 +45,19 @@ def generate_launch_description():
     
     declare_wheel_separation = DeclareLaunchArgument(
         "wheel_separation",
-        default_value=TextSubstitution(text="0.30"),
+        default_value=TextSubstitution(text="0.43"),  # Teknofest-AGV değeri (gerçek robot ölçüsü)
         description="Tekerlekler arası mesafe (metre)"
     )
     
     declare_wheel_radius = DeclareLaunchArgument(
         "wheel_radius",
-        default_value=TextSubstitution(text="0.05"),
+        default_value=TextSubstitution(text="0.050"),  # Teknofest-AGV değeri (gerçek robot ölçüsü)
         description="Tekerlek yarıçapı (metre)"
     )
     
     declare_encoder_counts_per_rev = DeclareLaunchArgument(
         "encoder_counts_per_rev",
-        default_value=TextSubstitution(text="3600"),
+        default_value=TextSubstitution(text="4000"),  # Teknofest-AGV değeri (gerçek encoder çözünürlüğü)
         description="Encoder çözünürlüğü (bir turdaki tick sayısı)"
     )
     
