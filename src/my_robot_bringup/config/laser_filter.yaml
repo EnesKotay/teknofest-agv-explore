@@ -1,29 +1,48 @@
 # ============================================================================
-# LIDAR Box Filter Konfigürasyonu
+# LIDAR Box Filter - Profesyonel Konfigürasyon
 # ============================================================================
-# Bu dosya laser_filters paketinin LaserScanBoxFilter'ını yapılandırır.
+# Amaç: Robot gövdesini ve Karakuri platformunu LIDAR verisinden filtreler
+#       Böylece robot kendini engel olarak algılamaz.
 #
-# Ne yapar: Robot gövdesini ve Karakuri platformunu LIDAR verisinden filtreler.
-#           Böylece robot kendini engel olarak algılamaz.
+# Input:  /scan → Output: /scan_filtered
+# Nav2'nin tüm bileşenleri /scan_filtered kullanmalı
 #
-# Nasıl çalışır: Belirtilen box (kutu) içindeki LIDAR noktaları silinir.
-#                /scan -> /scan_filtered (filtrelenmiş veri)
+# Kullanım:
+#   real_robot_exploration.launch.py içinde yüklenir (1.5 saniye delay ile)
 #
-# Ölçüler: Robot + Karakuri platform boyutlarına göre ayarlanmıştır.
-#          Box frame: base_link (robot gövdesinin merkezi)
+# Kritik Şartlar:
+#   1️⃣ Launch Delay: 1.5 sn (lidar_node 1.0 sn sonra başlar) ✅
+#   2️⃣ TF Zinciri: base_link ↔ laser_link (URDF'de tanımlı) ✅
+#   3️⃣ YAML Format: Root namespace (scan_filter_chain) ✅
+#   4️⃣ Nav2 Config: Tüm config'lerde /scan_filtered kullanılıyor ✅
+#   5️⃣ Test: ros2 topic echo /scan_filtered | grep nan
 # ============================================================================
 
 scan_filter_chain:
   ros__parameters:
     scan_filter_chain:
       filters:
-  - name: zenit_body_filter
-    type: laser_filters/LaserScanBoxFilter
-    params:
-      box_frame: base_link  # LIDAR'ın referans aldığı gövde koordinatı
-      min_x: -0.40          # Arka sınır (75cm/2 + güvenlik payı)
-      max_x: 0.40           # Ön sınır (75cm/2 + güvenlik payı)
-      min_y: -0.35          # Sağ sınır (60cm/2 + güvenlik payı)
-      max_y: 0.35           # Sol sınır (60cm/2 + güvenlik payı)
-      min_z: -0.1           # LIDAR seviyesinin altı
-      max_z: 0.5            # LIDAR seviyesinin üstü (Karakuri profilleri için)
+        - name: robot_body_filter
+          type: laser_filters/LaserScanBoxFilter
+          params:
+            # TF Frame: Robot gövdesinin koordinat sistemi
+            box_frame: base_link
+
+            # Robot boyutları (75x60 cm + güvenlik payı)
+            # Robot merkezden ölçülür (base_link = robot merkezi)
+            min_x: -0.40  # Arka sınır (75cm/2 + güvenlik payı)
+            max_x:  0.40  # Ön sınır (75cm/2 + güvenlik payı)
+            min_y: -0.35  # Sağ sınır (60cm/2 + güvenlik payı)
+            max_y:  0.35  # Sol sınır (60cm/2 + güvenlik payı)
+            min_z: -0.10  # LIDAR seviyesinin altı
+            max_z:  0.50  # LIDAR seviyesinin üstü (Karakuri profilleri için)
+
+            # Box İÇİNİ sil → robot kendini görmez
+            # false: Box içindeki noktaları sil (robot gövdesi)
+            # true:  Box dışındaki noktaları sil (ters filtrelenmiş)
+            invert: false
+
+            # Performans optimizasyonu
+            # false: Daha hızlı (indices kullanmaz, tüm noktaları kontrol eder)
+            # true:  Daha yavaş ama bellek kullanımı daha iyi (indices kullanır)
+            use_indices: false
