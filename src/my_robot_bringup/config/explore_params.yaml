@@ -1,0 +1,47 @@
+frontier_explorer:
+  ros__parameters:
+    use_sim_time: true
+    
+    # Topic ve Frame ayarları
+    map_topic: /map
+    goal_frame: map
+    robot_frame: base_footprint
+    nav_action: navigate_to_pose
+    
+    # Hedef seçim parametreleri - DÖNÜŞ SORUNUNU ÖNLEMEK İÇİN OPTİMİZE EDİLDİ
+    min_goal_distance: 1.2          # Artırıldı: daha uzak hedefleri seçer, aynı yerde dönmez (0.5 -> 1.2)
+    goal_cooldown_sec: 1.0          # Artırıldı: daha az sıklıkla goal seçer (0.5 -> 1.0)
+    goal_timeout_sec: 60.0          # Takılma durumunda daha hızlı vazgeç
+    replan_period_sec: 1.5          # Daha sık kontrol
+    
+    # Harita işleme parametreleri - GÜVENLİK ARTIRILDI
+    free_value_max: 10              # 0..10 free kabul et (değişmedi)
+    occupied_value_min: 65          # 65..100 occupied kabul et (değişmedi)
+    safety_cell_radius: 4           # Artırıldı: goal etrafında daha güvenli alan (3 -> 4) - duvara çarpmayı önler
+    
+    # Başlangıca dönme parametreleri
+    return_to_start: true            # Haritalama bitince başlangıca dön
+    start_position_timeout: 10.0     # Başlangıç pozisyonunu kaydetmek için bekleme süresi (saniye)
+    
+    # GELİŞMİŞ ÖZELLİKLER - Teknofest Optimizasyonları
+    # Information Gain (Bilgi Kazancı) - Daha büyük keşfedilmemiş alana yakın frontieri önceliklendir
+    use_information_gain: true       # Information gain kullan (true/false)
+    information_gain_weight: 2.0     # Information gain ağırlığı (ne kadar önemli)
+    
+    # Frontier Clustering (Frontier Kümeleme) - Yakın frontieri grupla
+    frontier_cluster_distance: 5     # Piksel - kümeleme için maksimum mesafe
+    min_cluster_size: 3              # Minimum hücre sayısı (daha küçük kümeleri yok say)
+    
+    # Stuck Detection (Takılma Algılama)
+    stuck_detection_enabled: true    # Takılma algılamayı etkinleştir
+    stuck_distance_threshold: 0.5    # Metre - takılı sayılması için maksimum hareket mesafesi
+    stuck_time_threshold: 30.0       # Saniye - takılı sayılması için minimum süre
+    
+    # Performance Optimization (Performans Optimizasyonu)
+    roi_radius: 15.0                 # Metre - Region of Interest yarıçapı (sadece robot çevresini tara)
+    
+    # Visualization & Metrics (Görselleştirme ve Metrikler)
+    publish_visualization: true      # Frontier marker'larını yayınla (RViz'de görünsün)
+    publish_metrics: true            # Keşif metriklerini yayınla
+    visualization_topic: /frontier_markers
+    metrics_topic_prefix: /exploration_metrics
