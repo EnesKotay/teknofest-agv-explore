@@ -60,4 +60,8 @@ def main():
     except KeyboardInterrupt:
         pass
     node.destroy_node()
-    rclpy.shutdown()
+    # Shutdown'ı güvenli şekilde çağır - zaten shutdown edilmişse hata verme
+    try:
+        rclpy.shutdown()
+    except Exception:
+        pass  # Zaten shutdown edilmişse görmezden gel

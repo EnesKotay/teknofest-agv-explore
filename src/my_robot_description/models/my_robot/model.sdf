@@ -183,6 +183,7 @@
         
 
         
+        <!-- Gerçek robot LIDAR özellikleri: RPLIDAR A2M12, max_range=12.0m, scan_frequency=10Hz -->
         <lidar>
           <scan>
             <horizontal>
@@ -192,8 +193,8 @@
             </horizontal>
           </scan>
           <range>
-            <min>0.12</min>
-            <max>8.0</max>
+            <min>0.15</min>  <!-- Gerçek robot: RPLIDAR A2M12 min range (0.12 -> 0.15) -->
+            <max>12.0</max>  <!-- Gerçek robot: RPLIDAR A2M12 max range (8.0 -> 12.0) -->
             <resolution>0.01</resolution>
           </range>
         </lidar>
@@ -201,12 +202,13 @@
     </link>
 
     <!-- DIFF DRIVE -->
+    <!-- Gerçek robot özellikleri: wheel_separation=0.43m, wheel_radius=0.050m (controller) -->
     <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
       <left_joint>left_wheel_joint</left_joint>
       <right_joint>right_wheel_joint</right_joint>
 
-      <wheel_separation>0.30</wheel_separation>
-      <wheel_radius>0.05</wheel_radius>
+      <wheel_separation>0.43</wheel_separation>  <!-- Gerçek robot: 0.43m (0.30 -> 0.43) -->
+      <wheel_radius>0.05</wheel_radius>  <!-- Gerçek robot: 0.050m (controller için) -->
 
       <topic>/cmd_vel</topic>
       <odom_topic>/odom</odom_topic>

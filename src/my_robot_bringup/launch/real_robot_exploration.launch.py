@@ -117,10 +117,11 @@ def generate_launch_description():
                 name="rplidar_node",
                 parameters=[
                     {"serial_port": lidar_port},
-                    {"serial_baudrate": 115200},
+                    {"serial_baudrate": 115200},  # Gerçek robot: RPLIDAR A2M12 baudrate
                     {"frame_id": "laser_link"},
-                    {"range_min": 0.15},
-                    {"range_max": 16.0},
+                    {"range_min": 0.15},  # Gerçek robot: RPLIDAR A2M12 min range
+                    {"range_max": 12.0},  # Gerçek robot: RPLIDAR A2M12 max range (16.0 -> 12.0)
+                    {"scan_frequency": 10.0},  # Gerçek robot: RPLIDAR A2M12 scan frequency
                     {"use_sim_time": use_sim_time},
                 ],
                 output="screen",

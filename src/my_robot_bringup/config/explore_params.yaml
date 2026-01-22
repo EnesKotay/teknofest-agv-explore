@@ -9,19 +9,21 @@ frontier_explorer:
     nav_action: navigate_to_pose
     
     # Hedef seçim parametreleri - DÖNÜŞ SORUNUNU ÖNLEMEK İÇİN OPTİMİZE EDİLDİ
-    min_goal_distance: 1.2          # Artırıldı: daha uzak hedefleri seçer, aynı yerde dönmez (0.5 -> 1.2)
-    goal_cooldown_sec: 1.0          # Artırıldı: daha az sıklıkla goal seçer (0.5 -> 1.0)
-    goal_timeout_sec: 60.0          # Takılma durumunda daha hızlı vazgeç
+    min_goal_distance: 3.0          # Artırıldı: daha uzak hedefleri seçer (2.0 → 3.0) → Çok daha az dönüş!
+    goal_cooldown_sec: 3.0          # Artırıldı: çok daha az sıklıkla goal değişir (1.5 → 3.0) → Çok daha kararlı hareket
+    goal_timeout_sec: 60.0          # Exploration goal timeout (saniye)
+    return_to_start_timeout_sec: 120.0  # Return-to-start için daha uzun timeout (saniye)
     replan_period_sec: 1.5          # Daha sık kontrol
     
     # Harita işleme parametreleri - GÜVENLİK ARTIRILDI
     free_value_max: 10              # 0..10 free kabul et (değişmedi)
     occupied_value_min: 65          # 65..100 occupied kabul et (değişmedi)
-    safety_cell_radius: 4           # Artırıldı: goal etrafında daha güvenli alan (3 -> 4) - duvara çarpmayı önler
+    safety_cell_radius: 5           # Gerçek robot için artırıldı: goal etrafında daha güvenli alan (4 -> 5) - duvara çarpmayı önler
     
     # Başlangıca dönme parametreleri
     return_to_start: true            # Haritalama bitince başlangıca dön
-    start_position_timeout: 10.0     # Başlangıç pozisyonunu kaydetmek için bekleme süresi (saniye)
+    start_position_timeout: 2.0      # Başlangıç pozisyonunu kaydetmek için bekleme süresi (saniye)
+    start_position_tolerance: 0.6    # Nav2 xy_goal_tolerance (0.5m) + küçük margin - Goal tolerance ile uyumlu!
     
     # GELİŞMİŞ ÖZELLİKLER - Teknofest Optimizasyonları
     # Information Gain (Bilgi Kazancı) - Daha büyük keşfedilmemiş alana yakın frontieri önceliklendir
@@ -36,9 +38,14 @@ frontier_explorer:
     stuck_detection_enabled: true    # Takılma algılamayı etkinleştir
     stuck_distance_threshold: 0.5    # Metre - takılı sayılması için maksimum hareket mesafesi
     stuck_time_threshold: 30.0       # Saniye - takılı sayılması için minimum süre
+    stuck_velocity_threshold: 0.05   # m/s - velocity-based stuck detection threshold
+    use_velocity_stuck_detection: true  # Velocity-based stuck detection kullan (daha hızlı tepki)
     
     # Performance Optimization (Performans Optimizasyonu)
-    roi_radius: 15.0                 # Metre - Region of Interest yarıçapı (sadece robot çevresini tara)
+    roi_radius: 15.0                 # Metre - Region of Interest yarıçapı (base - dinamik olabilir)
+    roi_radius_min: 10.0             # Metre - Minimum ROI yarıçapı (erken exploration için)
+    roi_radius_max: 20.0             # Metre - Maximum ROI yarıçapı (geç exploration için)
+    use_dynamic_roi: true            # Dinamik ROI kullan (coverage'a göre ayarlanır)
     
     # Visualization & Metrics (Görselleştirme ve Metrikler)
     publish_visualization: true      # Frontier marker'larını yayınla (RViz'de görünsün)
