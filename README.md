@@ -8,7 +8,7 @@ ROS2 Jazzy tabanlı otonom keşif sistemi. Frontier-based exploration algoritmas
 - **SLAM:** SLAM Toolbox ile gerçek zamanlı harita oluşturma
 - **Navigasyon:** Nav2 stack ile otonom navigasyon
 - **Return-to-Start:** Keşif tamamlandıktan sonra başlangıç noktasına dönme
-- **Gerçek Robot Desteği:** STM32 Nucleo + Micro-ROS entegrasyonu
+- **Gerçek Robot Desteği:** STM32 + Serial Bridge + ROS2 Control entegrasyonu
 - **LIDAR Desteği:** RPLIDAR A2 entegrasyonu
 
 ## 📋 Gereksinimler
@@ -66,18 +66,31 @@ ros2 launch my_robot_bringup autonomous_exploration.launch.py
 
 ### Gerçek Robot
 
+**Ön Gereksinimler:**
 ```bash
-# Temel bringup (STM32 + LIDAR)
-ros2 launch my_robot_bringup real_robot_bringup.launch.py \
-    serial_port:=/dev/ttyACM0 \
-    baud_rate:=460800 \
-    lidar_port:=/dev/ttyUSB0
+# pyserial kurulumu
+pip3 install pyserial
+# veya
+sudo apt install python3-serial
 
-# Full system (Otonom keşif)
-ros2 launch my_robot_bringup real_robot_exploration.launch.py \
-    serial_port:=/dev/ttyACM0 \
-    baud_rate:=460800 \
-    lidar_port:=/dev/ttyUSB0
+# Serial port permission
+sudo usermod -aG dialout $USER
+newgrp dialout
+```
+
+**Temel Bringup (ROS2 Control):**
+```bash
+ros2 launch my_robot_bringup real_robot_control_bringup.launch.py \
+    serial_port:=/dev/ttyUSB0 \
+    baud_rate:=115200
+```
+
+**Otonom SLAM:**
+```bash
+ros2 launch my_robot_bringup real_robot_control_slam.launch.py \
+    serial_port:=/dev/ttyUSB0 \
+    baud_rate:=115200 \
+    lidar_port:=/dev/ttyUSB1
 ```
 
 ## 📁 Proje Yapısı

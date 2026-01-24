@@ -7,12 +7,15 @@ Gerçek Robot URDF - Teknofest Diffbot
 - Differential drive with caster wheel
 - LIDAR mounted on top
 
-NOT: ros2_control entegrasyonu YOK (Micro-ROS kullanıyoruz)
+NOT: ros2_control entegrasyonu var (Serial bridge + ROS2 Control kullanıyoruz)
 -->
 <robot name="my_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <!-- Import materials -->
   <xacro:include filename="$(find my_robot_description)/urdf/my_robot.materials.xacro" />
+  
+  <!-- Import ros2_control -->
+  <xacro:include filename="$(find my_robot_description)/urdf/my_robot.ros2_control.xacro" />
 
   <!-- Robot ölçüleri (Gerçek robot ölçüleri) -->
   <xacro:property name="PI" value="3.1415926535897931"/>
@@ -192,5 +195,8 @@ NOT: ros2_control entegrasyonu YOK (Micro-ROS kullanıyoruz)
         izz="0.001"/>
     </inertial>
   </link>
+
+  <!-- ROS2 Control -->
+  <xacro:my_robot_ros2_control name="my_robot" prefix="" />
 
 </robot>

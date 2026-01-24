@@ -21,6 +21,7 @@ setup(
         'console_scripts': [
             'frontier_explorer = my_robot_explore.frontier_explorer:main',
             'odom_tf_broadcaster = my_robot_explore.odom_tf_broadcaster:main',
+            'stm32_serial_bridge = my_robot_explore.stm32_serial_bridge:main',
         ],
     },
 )
